@@ -1,0 +1,32 @@
+name: deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Build and push image
+        run: |
+          docker build -t gcr.io/${{ secrets.PROJECT_ID }}/app:${{ github.sha }} app
+          docker push gcr.io/${{ secrets.PROJECT_ID }}/app:${{ github.sha }}
+
+      - name: Terraform apply
+        working-directory: terraform
+        run: |
+          terraform init
+          terraform apply -auto-approve \
+            -var="project_id=${{ secrets.PROJECT_ID }}" \
+            -var="image=gcr.io/${{ secrets.PROJECT_ID }}/app:${{ github.sha }}"
+
