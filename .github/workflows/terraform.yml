@@ -43,10 +43,11 @@ jobs:
       # 4. Terraform Plan
       # Checks what needs to happen. We assume this is always safe to run.
       - name: Terraform Plan
-        run: terraform plan -input=false
+        run: terraform plan -input=false -lock=false
 
       # 5. Terraform Apply
       # Only runs on 'main' branch. The '-auto-approve' flag is required for automation.
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
         run: terraform apply -auto-approve -input=false
