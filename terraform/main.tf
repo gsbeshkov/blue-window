@@ -18,7 +18,7 @@ module "app" {
   source        = "./modules/cloudrun"
   image         = var.image
   region        = var.region
-  bucket_name   = module.static.bucket
+  bucket_name   = module.static.bucket_name
   db_connection = module.db.connection_name
 }
 
